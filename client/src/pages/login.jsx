@@ -52,7 +52,7 @@ function LoginFunction(props) {
               })
                 .then((res) => res.json())
                 .then((json) => {
-                  if (json.isLogin) {
+                  if (json.isLogin === "True") {
                     props.setMode("COMPLETE");
                   } else {
                     alert(json.isLogin);
@@ -138,7 +138,7 @@ function JoinFunction(props) {
               })
                 .then((res) => res.json())
                 .then((json) => {
-                  if (json.isSuccess) {
+                  if (json.isSuccess === "True") {
                     alert("회원가입이 완료되었습니다!");
                     props.setMode("LOGIN");
                   } else {
@@ -171,7 +171,7 @@ const Login = (props) => {
     fetch("http://localhost:8000/authcheck")
       .then((res) => res.json())
       .then((json) => {
-        if (json.isLogin) {
+        if (json.isLogin === "True") {
           setMode("COMPLETE");
         } else {
           setMode("LOGIN");
@@ -189,7 +189,14 @@ const Login = (props) => {
     content = (
       <>
         <p>로그인 성공!</p>
-        <a href="http://localhost:8000/logout">로그아웃</a>
+        <button
+          onClick={() => {
+            setMode("LOGIN");
+            fetch("http://localhost:8000/logout");
+          }}
+        >
+          로그아웃
+        </button>
       </>
     );
   }

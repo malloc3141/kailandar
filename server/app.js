@@ -38,8 +38,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.get("/authcheck", (req, res) => {
-  const sendData = { isLogin: false };
-  sendData.isLogin = req.session.is_logined;
+  const sendData = { isLogin: "" };
+  if (req.session.is_logined) sendData.isLogin = "True";
+  else sendData.isLogin = "False";
   res.send(sendData);
 });
 
@@ -52,7 +53,7 @@ app.get("/logout", (req, res) => {
 app.post("/login", (req, res) => {
   const username = req.body.userId;
   const password = req.body.userPassword;
-  const sendData = { isLogin: false };
+  const sendData = { isLogin: "" };
 
   if (username && password) {
     db.query(
@@ -66,11 +67,11 @@ app.post("/login", (req, res) => {
               req.session.is_logined = true;
               req.session.nickname = username;
               req.session.save(() => {
-                sendData.isLogin = true;
+                sendData.isLogin = "True";
                 res.send(sendData);
               });
             } else {
-              sendData.isLogin = false;
+              sendData.isLogin = "Incorrect user Info";
               res.send(sendData);
             }
           });
@@ -78,7 +79,7 @@ app.post("/login", (req, res) => {
       },
     );
   } else {
-    sendData.isLogin = false;
+    sendData.isLogin = "Please put something in username & password";
     res.send(sendData);
   }
 });
@@ -95,27 +96,33 @@ app.post("/join", (req, res) => {
       [username],
       (error, results, fields) => {
         if (error) throw error;
-        if (result.length === 0 && password === password2) {
+        if (results.length === 0 && password === password2) {
           const hashedPassword = bcrypt.hashSync(password, 10);
           db.query(
             "INSERT INTO user (id, password) VALUES(?,?)",
-            [id, hashedPassword],
+            [username, hashedPassword],
             (error, data) => {
               if (error) throw error;
               req.session.save(() => {
-                sendData.isSuccess = true;
+                sendData.isSuccess = "True";
                 res.send(sendData);
               });
             },
           );
+        } else if (results.length === 0) {
+          sendData.isSuccess = "Passwords does not match";
+          res.send(sendData);
+        } else if (password === password2) {
+          sendData.isSuccess = "User Already Exists";
+          res.send(sendData);
         } else {
-          sendData.isSuccess = false;
+          sendData.isSuccess = "Something went wrong";
           res.send(sendData);
         }
       },
     );
   } else {
-    sendData.isSuccess = false;
+    sendData.isSuccess = "Please put something in all blanks";
     res.send(sendData);
   }
 });
