@@ -1,28 +1,43 @@
-import React from "react";
+import React, {useContext} from "react";
 import { useNavigate } from "react-router-dom";
+import {UserContext} from "./usercontext";
 
 const Header = () => {
   const navigate = useNavigate();
+const {user, setUser}=useContext(UserContext);
   return (
     <div>
-      <div className={"header"}>
-        <div className={"header-content-wrapper"}>
+        <div className={"flex justify-center items-center"}>
           <div
-            className={"home-link"}
-            role="button"
-            onClick={(e) => navigate("/mycal")}
+              className={"font-noto origin-center font-bold text-2xl text-black inline-block hover:text-blue-500"}
+              role="button"
+              onClick={(e) => navigate("/mycal")}
           >
             KAIlendar
           </div>
           <div
-            className={"right-0"}
-            role="button"
-            onClick={(e) => navigate("/mypage")}
+              className={"absolute right-[10vw] top-[1.5vh] font-noto hover:text-blue-500"}
+              role="button"
+              onClick={(e) => navigate("/mypage")}
           >
             마이페이지
           </div>
+          <button className={"absolute right-[2vw] top-[1.5vh] font-noto hover:text-blue-500"}
+              onClick={() => {
+                window.localStorage.setItem("id", JSON.stringify(null));
+                setUser(null);
+                  fetch("http://localhost:8000/logout",{
+                      method:"post",
+                      headers:{
+                          "content-type":"application/json",
+                      },
+                  });
+                navigate("/");
+              }}
+          >
+            로그아웃
+          </button>
         </div>
-      </div>
     </div>
   );
 };

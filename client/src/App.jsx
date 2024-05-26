@@ -7,12 +7,14 @@ import Login from "./pages/login";
 import Mycal from "./pages/mycal";
 import MyPage from "./pages/mypage";
 import CustomCalendar from "./pages/customcalendar";
+import Header from "./components/header";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route element={<Header/>}/>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/mycal" element={<Mycal />} />

@@ -25,7 +25,7 @@ app.use(
   }),
 );
 
-const whitelist = ["http://localhost:3000", "http://localhost:8000"];
+const whitelist = ["http://localhost:3000", "http://localhost:8000","malloc.newbie.sparcsandbox.com"];
 const corsOptions = {
   origin: (origin, callback) => {
     console.log("[REQUEST-CORS] Request from origin: ", origin);
@@ -44,9 +44,9 @@ app.get("/authcheck", (req, res) => {
   res.send(sendData);
 });
 
-app.get("/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.redirect("/");
+app.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    res.status(200).send("Success");
   });
 });
 
@@ -147,45 +147,6 @@ app.post("/new", (req, res) => {
     const getMajorId = (major) => {
       return new Promise((resolve, reject) => {
         db.query(
-          "SELECT department_id FROM department WHERE name=?",
-          [major],
-          (error, results, fields) => {
-            if (error) {
-              reject(error);
-            } else if (results.length === 0) {
-              sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
-              res.send(sendData);
-              resolve(null);
-            } else {
-              resolve(results[0].department_id);
-            }
-          },
-        );
-      });
-    };
-
-    const handleMajorId = async () => {
-      try {
-        const id = await getMajorId(major);
-        if (id !== null) {
-          major_id = id;
-        }
-      } catch (error) {
-        console.error(error);
-        res.status(500).send({ isSuccess: "서버 오류 발생" });
-      }
-    };
-
-    handleMajorId();
-
-    let major2_id;
-
-    if (major2 === "") {
-      major2_id = -2;
-    } else {
-      const getMajor2Id = (major) => {
-        return new Promise((resolve, reject) => {
-          db.query(
             "SELECT department_id FROM department WHERE name=?",
             [major],
             (error, results, fields) => {
@@ -194,88 +155,7 @@ app.post("/new", (req, res) => {
               } else if (results.length === 0) {
                 sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
                 res.send(sendData);
-                resolve(null); // 여기가 중요합니다. 리턴되지 않도록 resolve(null) 처리.
-              } else {
-                resolve(results[0].department_id);
-              }
-            },
-          );
-        });
-      };
-
-      const handleMajor2Id = async () => {
-        try {
-          const id = await getMajor2Id(major2);
-          if (id !== null) {
-            major2_id = id;
-          }
-        } catch (error) {
-          console.error(error);
-          res.status(500).send({ isSuccess: "서버 오류 발생" });
-        }
-      };
-
-      handleMajor2Id();
-    }
-
-    if (major_id !== -1 && major2_id !== -1) {
-      db.query(
-        "SELECT * FROM user WHERE id = ?",
-        [id],
-        (error, results, fields) => {
-          if (error) throw error;
-          if (results.length === 0) {
-            // Unhandled Situation
-            sendData.isSuccess = "무언가 잘못되었습니다";
-            res.send(sendData);
-          } else {
-            if (major2_id === -2) major2_id = null;
-            db.query(
-              "UPDATE user SET name=?, email=?, student_id=?, major=?, major2=? WHERE id=?",
-              [name, email, studentId, major_id, major2_id, id],
-              (error, data) => {
-                if (error) throw error;
-                req.session.save(() => {
-                  sendData.isSuccess = "True";
-                  res.send(sendData);
-                });
-              },
-            );
-          }
-        },
-      );
-    }
-  } else {
-    sendData.isSuccess =
-      "복수전공/부전공을 제외한 모든 정보는 입력되어야 합니다";
-    res.send(sendData);
-  }
-});
-
-app.post("/change-user-info", (req, res) => {
-  const id = req.body.id;
-  const password=req.body.password;
-  const name = req.body.name;
-  const email = req.body.email;
-  const studentId = req.body.studentId;
-  const major = req.body.major;
-  const major2 = req.body.major2;
-
-  const sendData = { isSuccess: "" };
-  if (name && email && studentId && major) {
-    let major_id;
-    const getMajorId = (major) => {
-      return new Promise((resolve, reject) => {
-        db.query(
-            "SELECT department_id FROM department WHERE name=?",
-            [major],
-            (error, results, fields) => {
-              if (error) {
-                reject(error);
-              } else if (results.length === 0) {
-                sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
-                res.send(sendData);
-                resolve(null); // 여기가 중요합니다. 리턴되지 않도록 resolve(null) 처리.
+                resolve(null);
               } else {
                 resolve(results[0].department_id);
               }
@@ -314,7 +194,127 @@ app.post("/change-user-info", (req, res) => {
                 } else if (results.length === 0) {
                   sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
                   res.send(sendData);
-                  resolve(null); // 여기가 중요합니다. 리턴되지 않도록 resolve(null) 처리.
+                  resolve(null);
+                } else {
+                  resolve(results[0].department_id);
+                }
+              },
+          );
+        });
+      };
+
+      const handleMajor2Id = async () => {
+        try {
+          const id = await getMajor2Id(major2);
+          if (id !== null) {
+            major2_id = id;
+          }
+        } catch (error) {
+          console.error(error);
+          res.status(500).send({ isSuccess: "서버 오류 발생" });
+        }
+      };
+
+      handleMajor2Id();
+    }
+
+    if (major_id !== -1 && major2_id !== -1) {
+      db.query(
+          "SELECT * FROM user WHERE id = ?",
+          [id],
+          (error, results, fields) => {
+            if (error) throw error;
+            if (results.length === 0) {
+              // Unhandled Situation
+              sendData.isSuccess = "무언가 잘못되었습니다";
+              res.send(sendData);
+            } else {
+              if (major2_id === -2) major2_id = null;
+              db.query(
+                  "UPDATE user SET name=?, email=?, student_id=?, major=?, major2=? WHERE id=?",
+                  [name, email, studentId, major_id, major2_id, id],
+                  (error, data) => {
+                    if (error) throw error;
+                    req.session.save(() => {
+                      sendData.isSuccess = "True";
+                      res.send(sendData);
+                    });
+                  },
+              );
+            }
+          },
+      );
+    }
+  } else {
+    sendData.isSuccess =
+        "복수전공/부전공을 제외한 모든 정보는 입력되어야 합니다";
+    res.send(sendData);
+  }
+});
+
+app.post("/change-user-info", (req, res) => {
+  const id = req.body.id;
+  const password=req.body.password;
+  const name = req.body.name;
+  const email = req.body.email;
+  const studentId = req.body.studentId;
+  const major = req.body.major;
+  const major2 = req.body.major2;
+
+  const sendData = { isSuccess: "" };
+  if (name && email && studentId && major) {
+    let major_id;
+    const getMajorId = (major) => {
+      return new Promise((resolve, reject) => {
+        db.query(
+            "SELECT department_id FROM department WHERE name=?",
+            [major],
+            (error, results, fields) => {
+              if (error) {
+                reject(error);
+              } else if (results.length === 0) {
+                sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
+                res.send(sendData);
+                resolve(null);
+              } else {
+                resolve(results[0].department_id);
+              }
+            },
+        );
+      });
+    };
+
+    const handleMajorId = async () => {
+      try {
+        const id = await getMajorId(major);
+        if (id !== null) {
+          major_id = id;
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ isSuccess: "서버 오류 발생" });
+      }
+    };
+
+    handleMajorId();
+
+    let major2_id;
+
+    if (major2 === "") {
+      major2_id = -2;
+    } else {
+      const getMajor2Id = (major) => {
+        return new Promise((resolve, reject) => {
+          db.query(
+              "SELECT department_id FROM department WHERE name=?",
+              [major],
+              (error, results, fields) => {
+                if (error) {
+                  reject(error);
+                } else if (results.length === 0) {
+                  sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
+                  res.send(sendData);
+                  resolve(null);
                 } else {
                   resolve(results[0].department_id);
                 }
@@ -399,6 +399,17 @@ app.post("/dp-event", (req,res)=>{
 app.get('/dp-names',(req,res)=>{
   db.query("SELECT name FROM department", (err, result, fields)=>{
     if (err) {
+      res.status(500).send(err);
+    }
+    else {
+      res.json(result);
+    }
+  });
+});
+
+app.post('/dp-id-name',(req,res)=>{
+  db.query("SELECT name FROM department WHERE department_id=?", [req.body.id],(err,result,fields)=>{
+    if (err){
       res.status(500).send(err);
     }
     else {

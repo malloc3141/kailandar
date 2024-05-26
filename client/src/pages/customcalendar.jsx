@@ -7,48 +7,19 @@ import axios from "axios";
 
 import Header from "../components/header";
 import EventInfo from "../components/eventinfo";
-
-function DpDropDown(props) {
-  const [isDropdown, setIsDropdown] = useState(false);
-  const [dropDownItems, setDropDownItems] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:8000/dp-names")
-      .then((response) => {
-        setDropDownItems(response.data);
-      })
-      .catch((err) => {
-        console.error("Error fetching from DB", err);
-        setDropDownItems([]);
-      });
-  }, []);
-
-  const handleSelect = (e) => {
-    props.setDepartment(e.target.value);
-  };
-
-  return (
-    <div>
-      <select onChange={handleSelect}>
-        {dropDownItems.map((item, index) => (
-          <option key={index} value={item.name}>
-            {item.name}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
+import DpDropDown from "../components/dpdropdown";
 
 function EventSection(props) {
-  return(props.events.length > 0 ? (
-      props.events.map((value, index) => (
-          <EventInfo key={index} info={props.events[index]} />
-      ))
+  return props.events.length > 0 ? (
+    props.events.map((value, index) => (
+      <>
+        <EventInfo key={index} info={props.events[index]} />
+        <div className={"mt-5 mb-5"}></div>
+      </>
+    ))
   ) : (
-      <p>행사 정보가 없습니다.</p>
-  ));
+    <p className={"text-noto text-l"}>행사 정보가 없습니다.</p>
+  );
 }
 
 const CustomCalendar = () => {
@@ -68,8 +39,8 @@ const CustomCalendar = () => {
         },
         body: JSON.stringify({ date: dateString, dp: department }),
       })
-          .then((res) => res.json())
-          .then((res) => setEvents(res));
+        .then((res) => res.json())
+        .then((res) => setEvents(res));
     }
   }, [dateString, department]);
 
@@ -79,20 +50,39 @@ const CustomCalendar = () => {
   };
 
   return (
-    <>
+    <div className={"h-screen bg-gradient-to-b from-blue-200 to-blue-50"}>
       <Header />
-      <div>
-        <DpDropDown department={department} setDepartment={setDepartment} />
-        <Calendar
-          onChange={handleClick}
-          value={value}
-          formatDay={(locale, date) =>
-            date.toLocaleString("en", { day: "numeric" })
-          }
-        />
-        <EventSection events={events}/>
+      <div className={"border-2 border-blue-100 mt-3 mb-3 "}></div>
+      <div
+        className={
+          "absolute top-[8vh] left-[45.5vw] font-noto font-bold text-xl"
+        }
+      >
+        학과별 캘린더
       </div>
-    </>
+        <div className={"absolute top-[18vh] left-[26vw]"}>
+            <DpDropDown department={department} setDepartment={setDepartment}/>
+            <Calendar
+                onChange={handleClick}
+                value={value}
+                formatDay={(locale, date) =>
+                    date.toLocaleString("en", {day: "numeric"})
+                }
+            />
+            <div
+                className={
+                    "absolute font-noto top-[43vh] hover:text-blue-500 font-bold"
+                }
+                role={"button"}
+                onClick={() => navigate("/mycal")}
+            >
+                {"<<내 캘린더로 돌아가기"}
+            </div>
+        </div>
+        <div className={"absolute left-[51vw] top-[21.5vh]"}>
+            <EventSection events={events}/>
+        </div>
+    </div>
   );
 };
 export default CustomCalendar;
