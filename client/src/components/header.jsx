@@ -26,7 +26,7 @@ const {user, setUser}=useContext(UserContext);
               onClick={() => {
                 window.localStorage.setItem("id", JSON.stringify(null));
                 setUser(null);
-                  fetch("http://localhost:8000/logout",{
+                  fetch("https://api.malloc.newbie.sparcsandbox.com/logout",{
                       method:"post",
                       headers:{
                           "content-type":"application/json",

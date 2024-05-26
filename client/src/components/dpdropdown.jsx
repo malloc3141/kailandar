@@ -6,7 +6,7 @@ function DpDropDown(props) {
 
     useEffect(() => {
         axios
-            .get("http://localhost:8000/dp-names")
+            .get("https://api.malloc.newbie.sparcsandbox.com/dp-names")
             .then((response) => {
                 setDropDownItems(response.data);
             })

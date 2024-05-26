@@ -12,7 +12,7 @@ const Home = () => {
   useEffect(() => {
     const id = JSON.parse(window.localStorage.getItem("id"));
     if (id !== null) {
-      fetch("http://localhost:8000/get-user", {
+      fetch("https://api.malloc.newbie.sparcsandbox.com/get-user", {
         method: "post",
         headers: {
           "content-type": "application/json",
@@ -29,7 +29,7 @@ const Home = () => {
 
   return (
     <div className="flex justify-center items-center align-middle h-screen bg-gradient-to-b from-blue-200 to-blue-50">
-      <h1 className="font-noto origin-center font-bold text-8xl mb-10 text-blue-500 inline-block text-transparent bg-clip-text">
+      <h1 className="font-noto origin-center font-bold text-8xl mb-10 text-blue-500 inline-block">
         KAIlendar
       </h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <div className="inline text-right mr-3 font-noto font-bold text-2xl text-blue-700" role="button" onClick={login}>

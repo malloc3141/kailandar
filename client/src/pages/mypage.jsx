@@ -18,7 +18,7 @@ const MyPage = () => {
 
   useEffect(() => {
     const id = JSON.parse(window.localStorage.getItem("id"));
-    fetch("http://localhost:8000/get-user", {
+    fetch("https://api.malloc.newbie.sparcsandbox.com/get-user", {
       method: "post",
       headers: {
         "content-type": "application/json",
@@ -139,7 +139,7 @@ const MyPage = () => {
                   major: major,
                   major2: major2,
                 };
-                fetch("http://localhost:8000/change-user-info", {
+                fetch("https://api.malloc.newbie.sparcsandbox.com/change-user-info", {
                   method: "post",
                   headers: {
                     "content-type": "application/json",
@@ -174,7 +174,7 @@ const MyPage = () => {
                     major: major,
                     major2: major2,
                   };
-                  fetch("http://localhost:8000/change-user-info", {
+                  fetch("https://api.malloc.newbie.sparcsandbox.com/change-user-info", {
                     method: "post",
                     headers: {
                       "content-type": "application/json",

@@ -36,7 +36,7 @@ const MyCal = () => {
   useEffect(() => {
     const id = JSON.parse(window.localStorage.getItem("id"));
     if (id !== null) {
-      fetch("http://localhost:8000/get-user", {
+      fetch("https://api.malloc.newbie.sparcsandbox.com/get-user", {
         method: "post",
         headers: {
           "content-type": "application/json",
@@ -58,6 +58,9 @@ const MyCal = () => {
           window.localStorage.setItem("major2", JSON.stringify(res[0].major2));
         });
     }
+    else {
+      navigate("/");
+    }
   }, []);
 
   useEffect(() => {
@@ -67,12 +70,12 @@ const MyCal = () => {
 
       if (dateString) {
         const [majorRes, major2Res] = await Promise.all([
-          fetch("http://localhost:8000/dp-id-name", {
+          fetch("https://api.malloc.newbie.sparcsandbox.com/dp-id-name", {
             method: "post",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ id: major }),
           }).then((res) => res.json()),
-          fetch("http://localhost:8000/dp-id-name", {
+          fetch("https://api.malloc.newbie.sparcsandbox.com/dp-id-name", {
             method: "post",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ id: major2 }),
@@ -83,12 +86,12 @@ const MyCal = () => {
         setMajor2Name(major2Res[0].name);
 
         const [eventsRes1, eventsRes2] = await Promise.all([
-          fetch("http://localhost:8000/dp-event", {
+          fetch("https://api.malloc.newbie.sparcsandbox.com/dp-event", {
             method: "post",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ date: dateString, dp: majorRes[0].name }),
           }).then((res) => res.json()),
-          fetch("http://localhost:8000/dp-event", {
+          fetch("https://api.malloc.newbie.sparcsandbox.com/dp-event", {
             method: "post",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ date: dateString, dp: major2Res[0].name }),
@@ -138,7 +141,7 @@ const MyCal = () => {
               role={"button"}
               onClick={() => navigate("/calendar")}
           >
-              학과별 캘린더 보러가기>>
+              {"학과별 캘린더 보러가기>>"}
           </div>
       </div>
   );

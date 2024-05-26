@@ -32,7 +32,7 @@ const CustomCalendar = () => {
   const [events, setEvents] = useState([]);
   useEffect(() => {
     if (dateString && department) {
-      fetch("http://localhost:8000/dp-event", {
+      fetch("https://api.malloc.newbie.sparcsandbox.com/dp-event", {
         method: "post",
         headers: {
           "content-type": "application/json",

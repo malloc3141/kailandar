@@ -62,7 +62,7 @@ function LoginFunction(props) {
                 userId: id,
                 userPassword: password,
               };
-              fetch("http://localhost:8000/login", {
+              fetch("https://api.malloc.newbie.sparcsandbox.com/login", {
                 method: "post",
                 headers: {
                   "content-type": "application/json",
@@ -96,7 +96,7 @@ function LoginFunction(props) {
                   userId: id,
                   userPassword: password,
                 };
-                fetch("http://localhost:8000/login", {
+                fetch("https://api.malloc.newbie.sparcsandbox.com/login", {
                   method: "post",
                   headers: {
                     "content-type": "application/json",
@@ -202,7 +202,7 @@ function JoinFunction(props) {
               userPassword: password,
               userPassword2: password2,
             };
-            fetch("http://localhost:8000/join", {
+            fetch("https://api.malloc.newbie.sparcsandbox.com/join", {
               method: "post",
               headers: {
                 "content-type": "application/json",
@@ -230,7 +230,7 @@ function JoinFunction(props) {
                 userPassword: password,
                 userPassword2: password2,
               };
-              fetch("http://localhost:8000/join", {
+              fetch("https://api.malloc.newbie.sparcsandbox.com/join", {
                 method: "post",
                 headers: {
                   "content-type": "application/json",
@@ -337,7 +337,7 @@ function FirstLogin(props) {
                 major: major,
                 major2: major2,
             };
-            fetch("http://localhost:8000/new", {
+            fetch("https://api.malloc.newbie.sparcsandbox.com/new", {
                 method: "post",
                 headers: {
                     "content-type": "application/json",
@@ -368,7 +368,7 @@ function FirstLogin(props) {
                 major: major,
                 major2: major2,
               };
-              fetch("http://localhost:8000/new", {
+              fetch("https://api.malloc.newbie.sparcsandbox.com/new", {
                 method: "post",
                 headers: {
                   "content-type": "application/json",
@@ -397,7 +397,7 @@ const Login = (props) => {
   const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
-    fetch("http://localhost:8000/authcheck")
+    fetch("https://api.malloc.newbie.sparcsandbox.com/authcheck")
       .then((res) => res.json())
       .then((json) => {
         if (json.isLogin === "True") {

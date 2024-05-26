@@ -25,7 +25,7 @@ app.use(
   }),
 );
 
-const whitelist = ["http://localhost:3000", "http://localhost:8000","malloc.newbie.sparcsandbox.com"];
+const whitelist = ["http://localhost:3000", "http://localhost:8000", "https://malloc.newbie.sparcsandbox.com", "http://api.malloc.newbie.sparcsandbox.com"];
 const corsOptions = {
   origin: (origin, callback) => {
     console.log("[REQUEST-CORS] Request from origin: ", origin);
@@ -147,19 +147,19 @@ app.post("/new", (req, res) => {
     const getMajorId = (major) => {
       return new Promise((resolve, reject) => {
         db.query(
-            "SELECT department_id FROM department WHERE name=?",
-            [major],
-            (error, results, fields) => {
-              if (error) {
-                reject(error);
-              } else if (results.length === 0) {
-                sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
-                res.send(sendData);
-                resolve(null);
-              } else {
-                resolve(results[0].department_id);
-              }
-            },
+          "SELECT department_id FROM department WHERE name=?",
+          [major],
+          (error, results, fields) => {
+            if (error) {
+              reject(error);
+            } else if (results.length === 0) {
+              sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
+              res.send(sendData);
+              resolve(null);
+            } else {
+              resolve(results[0].department_id);
+            }
+          },
         );
       });
     };
@@ -186,19 +186,19 @@ app.post("/new", (req, res) => {
       const getMajor2Id = (major) => {
         return new Promise((resolve, reject) => {
           db.query(
-              "SELECT department_id FROM department WHERE name=?",
-              [major],
-              (error, results, fields) => {
-                if (error) {
-                  reject(error);
-                } else if (results.length === 0) {
-                  sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
-                  res.send(sendData);
-                  resolve(null);
-                } else {
-                  resolve(results[0].department_id);
-                }
-              },
+            "SELECT department_id FROM department WHERE name=?",
+            [major],
+            (error, results, fields) => {
+              if (error) {
+                reject(error);
+              } else if (results.length === 0) {
+                sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
+                res.send(sendData);
+                resolve(null);
+              } else {
+                resolve(results[0].department_id);
+              }
+            },
           );
         });
       };
@@ -220,41 +220,41 @@ app.post("/new", (req, res) => {
 
     if (major_id !== -1 && major2_id !== -1) {
       db.query(
-          "SELECT * FROM user WHERE id = ?",
-          [id],
-          (error, results, fields) => {
-            if (error) throw error;
-            if (results.length === 0) {
-              // Unhandled Situation
-              sendData.isSuccess = "무언가 잘못되었습니다";
-              res.send(sendData);
-            } else {
-              if (major2_id === -2) major2_id = null;
-              db.query(
-                  "UPDATE user SET name=?, email=?, student_id=?, major=?, major2=? WHERE id=?",
-                  [name, email, studentId, major_id, major2_id, id],
-                  (error, data) => {
-                    if (error) throw error;
-                    req.session.save(() => {
-                      sendData.isSuccess = "True";
-                      res.send(sendData);
-                    });
-                  },
-              );
-            }
-          },
+        "SELECT * FROM user WHERE id = ?",
+        [id],
+        (error, results, fields) => {
+          if (error) throw error;
+          if (results.length === 0) {
+            // Unhandled Situation
+            sendData.isSuccess = "무언가 잘못되었습니다";
+            res.send(sendData);
+          } else {
+            if (major2_id === -2) major2_id = null;
+            db.query(
+              "UPDATE user SET name=?, email=?, student_id=?, major=?, major2=? WHERE id=?",
+              [name, email, studentId, major_id, major2_id, id],
+              (error, data) => {
+                if (error) throw error;
+                req.session.save(() => {
+                  sendData.isSuccess = "True";
+                  res.send(sendData);
+                });
+              },
+            );
+          }
+        },
       );
     }
   } else {
     sendData.isSuccess =
-        "복수전공/부전공을 제외한 모든 정보는 입력되어야 합니다";
+      "복수전공/부전공을 제외한 모든 정보는 입력되어야 합니다";
     res.send(sendData);
   }
 });
 
 app.post("/change-user-info", (req, res) => {
   const id = req.body.id;
-  const password=req.body.password;
+  const password = req.body.password;
   const name = req.body.name;
   const email = req.body.email;
   const studentId = req.body.studentId;
@@ -267,19 +267,19 @@ app.post("/change-user-info", (req, res) => {
     const getMajorId = (major) => {
       return new Promise((resolve, reject) => {
         db.query(
-            "SELECT department_id FROM department WHERE name=?",
-            [major],
-            (error, results, fields) => {
-              if (error) {
-                reject(error);
-              } else if (results.length === 0) {
-                sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
-                res.send(sendData);
-                resolve(null);
-              } else {
-                resolve(results[0].department_id);
-              }
-            },
+          "SELECT department_id FROM department WHERE name=?",
+          [major],
+          (error, results, fields) => {
+            if (error) {
+              reject(error);
+            } else if (results.length === 0) {
+              sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
+              res.send(sendData);
+              resolve(null);
+            } else {
+              resolve(results[0].department_id);
+            }
+          },
         );
       });
     };
@@ -306,19 +306,19 @@ app.post("/change-user-info", (req, res) => {
       const getMajor2Id = (major) => {
         return new Promise((resolve, reject) => {
           db.query(
-              "SELECT department_id FROM department WHERE name=?",
-              [major],
-              (error, results, fields) => {
-                if (error) {
-                  reject(error);
-                } else if (results.length === 0) {
-                  sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
-                  res.send(sendData);
-                  resolve(null);
-                } else {
-                  resolve(results[0].department_id);
-                }
-              },
+            "SELECT department_id FROM department WHERE name=?",
+            [major],
+            (error, results, fields) => {
+              if (error) {
+                reject(error);
+              } else if (results.length === 0) {
+                sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
+                res.send(sendData);
+                resolve(null);
+              } else {
+                resolve(results[0].department_id);
+              }
+            },
           );
         });
       };
@@ -340,43 +340,43 @@ app.post("/change-user-info", (req, res) => {
 
     if (major_id !== -1 && major2_id !== -1) {
       db.query(
-          "SELECT * FROM user WHERE id = ?",
-          [id],
-          (error, results, fields) => {
-            if (error) throw error;
-            if (results.length === 0) {
-              // Unhandled Situation
-              sendData.isSuccess = "무언가 잘못되었습니다";
-              res.send(sendData);
-            } else {
-              if (major2_id === -2) major2_id = null;
-              bcrypt.compare(password, results[0].password, (error, result) => {
-                if (result) {
-                  db.query(
-                      "UPDATE user SET name=?, email=?, student_id=?, major=?, major2=? WHERE id=?",
-                      [name, email, studentId, major_id, major2_id, id],
-                      (error, data) => {
-                        if (error) throw error;
-                        req.session.save(() => {
-                          sendData.isSuccess = "True";
-                          res.send(sendData);
-                        });
-                      },
-                  );
-                }
-                else {
-                  sendData.isSuccess="비밀번호가 일치하지 않습니다.";
-                  res.send(sendData);
-                }
-              });
+        "SELECT * FROM user WHERE id = ?",
+        [id],
+        (error, results, fields) => {
+          if (error) throw error;
+          if (results.length === 0) {
+            // Unhandled Situation
+            sendData.isSuccess = "무언가 잘못되었습니다";
+            res.send(sendData);
+          } else {
+            if (major2_id === -2) major2_id = null;
+            bcrypt.compare(password, results[0].password, (error, result) => {
+              if (result) {
+                db.query(
+                  "UPDATE user SET name=?, email=?, student_id=?, major=?, major2=? WHERE id=?",
+                  [name, email, studentId, major_id, major2_id, id],
+                  (error, data) => {
+                    if (error) throw error;
+                    req.session.save(() => {
+                      sendData.isSuccess = "True";
+                      res.send(sendData);
+                    });
+                  },
+                );
+              }
+              else {
+                sendData.isSuccess = "비밀번호가 일치하지 않습니다.";
+                res.send(sendData);
+              }
+            });
 
-            }
-          },
+          }
+        },
       );
     }
   } else {
     sendData.isSuccess =
-        "복수전공/부전공을 제외한 모든 정보는 입력되어야 합니다";
+      "복수전공/부전공을 제외한 모든 정보는 입력되어야 합니다";
     res.send(sendData);
   }
 });
@@ -390,14 +390,14 @@ app.post("/date-event", (req,res)=>{
 });
 */
 
-app.post("/dp-event", (req,res)=>{
-  db.query("SELECT * FROM event WHERE day=? AND department_name=?", [req.body.date, req.body.dp], (err, result, fields)=>{
+app.post("/dp-event", (req, res) => {
+  db.query("SELECT * FROM event WHERE day=? AND department_name=?", [req.body.date, req.body.dp], (err, result, fields) => {
     res.json(result);
   });
 });
 
-app.get('/dp-names',(req,res)=>{
-  db.query("SELECT name FROM department", (err, result, fields)=>{
+app.get('/dp-names', (req, res) => {
+  db.query("SELECT name FROM department", (err, result, fields) => {
     if (err) {
       res.status(500).send(err);
     }
@@ -407,9 +407,9 @@ app.get('/dp-names',(req,res)=>{
   });
 });
 
-app.post('/dp-id-name',(req,res)=>{
-  db.query("SELECT name FROM department WHERE department_id=?", [req.body.id],(err,result,fields)=>{
-    if (err){
+app.post('/dp-id-name', (req, res) => {
+  db.query("SELECT name FROM department WHERE department_id=?", [req.body.id], (err, result, fields) => {
+    if (err) {
       res.status(500).send(err);
     }
     else {
@@ -418,9 +418,9 @@ app.post('/dp-id-name',(req,res)=>{
   });
 });
 
-app.post('/get-user',(req,res)=>{
-  db.query("SELECT * FROM user WHERE id=?",[req.body.id], (err, result, fields)=>{
-    if (err){
+app.post('/get-user', (req, res) => {
+  db.query("SELECT * FROM user WHERE id=?", [req.body.id], (err, result, fields) => {
+    if (err) {
       res.status(500).send(err);
     }
     else {
