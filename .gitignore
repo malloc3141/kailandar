@@ -12,6 +12,7 @@ package-lock.json
 /build
 /client/build
 /server/lib
+/dist
 
 # misc
 .DS_Store

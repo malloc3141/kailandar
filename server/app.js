@@ -65,13 +65,18 @@ app.post("/login", (req, res) => {
           bcrypt.compare(password, results[0].password, (error, result) => {
             if (result) {
               req.session.is_logined = true;
-              req.session.nickname = username;
+              req.session.id = username;
               req.session.save(() => {
-                sendData.isLogin = "True";
-                res.send(sendData);
+                if (results[0].name === null) {
+                  sendData.isLogin = "First";
+                  res.send(sendData);
+                } else {
+                  sendData.isLogin = "True";
+                  res.send(sendData);
+                }
               });
             } else {
-              sendData.isLogin = "Incorrect user Info";
+              sendData.isLogin = "비밀번호가 일치하지 않습니다";
               res.send(sendData);
             }
           });
@@ -79,7 +84,7 @@ app.post("/login", (req, res) => {
       },
     );
   } else {
-    sendData.isLogin = "Please put something in username & password";
+    sendData.isLogin = "아이디와 비밀번호를 입력해주세요";
     res.send(sendData);
   }
 });
@@ -110,21 +115,307 @@ app.post("/join", (req, res) => {
             },
           );
         } else if (results.length === 0) {
-          sendData.isSuccess = "Passwords does not match";
+          sendData.isSuccess = "비밀번호가 일치하지 않습니다";
           res.send(sendData);
         } else if (password === password2) {
-          sendData.isSuccess = "User Already Exists";
+          sendData.isSuccess = "중복되는 아이디가 있습니다";
           res.send(sendData);
         } else {
-          sendData.isSuccess = "Something went wrong";
+          sendData.isSuccess =
+            "중복되는 아이디가 있고 비밀번호가 일치하지 않습니다";
           res.send(sendData);
         }
       },
     );
   } else {
-    sendData.isSuccess = "Please put something in all blanks";
+    sendData.isSuccess = "입력란을 모두 채워야 합니다";
     res.send(sendData);
   }
+});
+
+app.post("/new", (req, res) => {
+  const id = req.body.id;
+  const name = req.body.name;
+  const email = req.body.email;
+  const studentId = req.body.studentId;
+  const major = req.body.major;
+  const major2 = req.body.major2;
+
+  const sendData = { isSuccess: "" };
+  if (name && email && studentId && major) {
+    let major_id;
+    const getMajorId = (major) => {
+      return new Promise((resolve, reject) => {
+        db.query(
+          "SELECT department_id FROM department WHERE name=?",
+          [major],
+          (error, results, fields) => {
+            if (error) {
+              reject(error);
+            } else if (results.length === 0) {
+              sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
+              res.send(sendData);
+              resolve(null);
+            } else {
+              resolve(results[0].department_id);
+            }
+          },
+        );
+      });
+    };
+
+    const handleMajorId = async () => {
+      try {
+        const id = await getMajorId(major);
+        if (id !== null) {
+          major_id = id;
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ isSuccess: "서버 오류 발생" });
+      }
+    };
+
+    handleMajorId();
+
+    let major2_id;
+
+    if (major2 === "") {
+      major2_id = -2;
+    } else {
+      const getMajor2Id = (major) => {
+        return new Promise((resolve, reject) => {
+          db.query(
+            "SELECT department_id FROM department WHERE name=?",
+            [major],
+            (error, results, fields) => {
+              if (error) {
+                reject(error);
+              } else if (results.length === 0) {
+                sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
+                res.send(sendData);
+                resolve(null); // 여기가 중요합니다. 리턴되지 않도록 resolve(null) 처리.
+              } else {
+                resolve(results[0].department_id);
+              }
+            },
+          );
+        });
+      };
+
+      const handleMajor2Id = async () => {
+        try {
+          const id = await getMajor2Id(major2);
+          if (id !== null) {
+            major2_id = id;
+          }
+        } catch (error) {
+          console.error(error);
+          res.status(500).send({ isSuccess: "서버 오류 발생" });
+        }
+      };
+
+      handleMajor2Id();
+    }
+
+    if (major_id !== -1 && major2_id !== -1) {
+      db.query(
+        "SELECT * FROM user WHERE id = ?",
+        [id],
+        (error, results, fields) => {
+          if (error) throw error;
+          if (results.length === 0) {
+            // Unhandled Situation
+            sendData.isSuccess = "무언가 잘못되었습니다";
+            res.send(sendData);
+          } else {
+            if (major2_id === -2) major2_id = null;
+            db.query(
+              "UPDATE user SET name=?, email=?, student_id=?, major=?, major2=? WHERE id=?",
+              [name, email, studentId, major_id, major2_id, id],
+              (error, data) => {
+                if (error) throw error;
+                req.session.save(() => {
+                  sendData.isSuccess = "True";
+                  res.send(sendData);
+                });
+              },
+            );
+          }
+        },
+      );
+    }
+  } else {
+    sendData.isSuccess =
+      "복수전공/부전공을 제외한 모든 정보는 입력되어야 합니다";
+    res.send(sendData);
+  }
+});
+
+app.post("/change-user-info", (req, res) => {
+  const id = req.body.id;
+  const password=req.body.password;
+  const name = req.body.name;
+  const email = req.body.email;
+  const studentId = req.body.studentId;
+  const major = req.body.major;
+  const major2 = req.body.major2;
+
+  const sendData = { isSuccess: "" };
+  if (name && email && studentId && major) {
+    let major_id;
+    const getMajorId = (major) => {
+      return new Promise((resolve, reject) => {
+        db.query(
+            "SELECT department_id FROM department WHERE name=?",
+            [major],
+            (error, results, fields) => {
+              if (error) {
+                reject(error);
+              } else if (results.length === 0) {
+                sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
+                res.send(sendData);
+                resolve(null); // 여기가 중요합니다. 리턴되지 않도록 resolve(null) 처리.
+              } else {
+                resolve(results[0].department_id);
+              }
+            },
+        );
+      });
+    };
+
+    const handleMajorId = async () => {
+      try {
+        const id = await getMajorId(major);
+        if (id !== null) {
+          major_id = id;
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ isSuccess: "서버 오류 발생" });
+      }
+    };
+
+    handleMajorId();
+
+    let major2_id;
+
+    if (major2 === "") {
+      major2_id = -2;
+    } else {
+      const getMajor2Id = (major) => {
+        return new Promise((resolve, reject) => {
+          db.query(
+              "SELECT department_id FROM department WHERE name=?",
+              [major],
+              (error, results, fields) => {
+                if (error) {
+                  reject(error);
+                } else if (results.length === 0) {
+                  sendData.isSuccess = "주전공 학과명을 정확히 입력해 주세요";
+                  res.send(sendData);
+                  resolve(null); // 여기가 중요합니다. 리턴되지 않도록 resolve(null) 처리.
+                } else {
+                  resolve(results[0].department_id);
+                }
+              },
+          );
+        });
+      };
+
+      const handleMajor2Id = async () => {
+        try {
+          const id = await getMajor2Id(major2);
+          if (id !== null) {
+            major2_id = id;
+          }
+        } catch (error) {
+          console.error(error);
+          res.status(500).send({ isSuccess: "서버 오류 발생" });
+        }
+      };
+
+      handleMajor2Id();
+    }
+
+    if (major_id !== -1 && major2_id !== -1) {
+      db.query(
+          "SELECT * FROM user WHERE id = ?",
+          [id],
+          (error, results, fields) => {
+            if (error) throw error;
+            if (results.length === 0) {
+              // Unhandled Situation
+              sendData.isSuccess = "무언가 잘못되었습니다";
+              res.send(sendData);
+            } else {
+              if (major2_id === -2) major2_id = null;
+              bcrypt.compare(password, results[0].password, (error, result) => {
+                if (result) {
+                  db.query(
+                      "UPDATE user SET name=?, email=?, student_id=?, major=?, major2=? WHERE id=?",
+                      [name, email, studentId, major_id, major2_id, id],
+                      (error, data) => {
+                        if (error) throw error;
+                        req.session.save(() => {
+                          sendData.isSuccess = "True";
+                          res.send(sendData);
+                        });
+                      },
+                  );
+                }
+                else {
+                  sendData.isSuccess="비밀번호가 일치하지 않습니다.";
+                  res.send(sendData);
+                }
+              });
+
+            }
+          },
+      );
+    }
+  } else {
+    sendData.isSuccess =
+        "복수전공/부전공을 제외한 모든 정보는 입력되어야 합니다";
+    res.send(sendData);
+  }
+});
+
+/*
+app.post("/date-event", (req,res)=>{
+  const dp_array=req.body.dp.map(()=>'?').join(',');
+  db.query("SELECT * FROM event WHERE day=? AND department_name IN ${dp_array}", [req.body.date, ...req.body.dp], (err, result, fields)=>{
+    res.json(result);
+  });
+});
+*/
+
+app.post("/dp-event", (req,res)=>{
+  db.query("SELECT * FROM event WHERE day=? AND department_name=?", [req.body.date, req.body.dp], (err, result, fields)=>{
+    res.json(result);
+  });
+});
+
+app.get('/dp-names',(req,res)=>{
+  db.query("SELECT name FROM department", (err, result, fields)=>{
+    if (err) {
+      res.status(500).send(err);
+    }
+    else {
+      res.json(result);
+    }
+  });
+});
+
+app.post('/get-user',(req,res)=>{
+  db.query("SELECT * FROM user WHERE id=?",[req.body.id], (err, result, fields)=>{
+    if (err){
+      res.status(500).send(err);
+    }
+    else {
+      res.json(result);
+    }
+  });
 });
 
 app.get("*", function (req, res) {
